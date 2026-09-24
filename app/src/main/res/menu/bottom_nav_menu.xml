@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/ic_menu_home_24"
-        android:title="@string/title_menu_home"
-        />
-    <item
         android:id="@+id/nav_upcoming_event"
         android:icon="@drawable/ic_menu_upcoming_24"
-        android:title="@string/title_menu_upcoming"
-        />
+        android:title="@string/title_menu_upcoming" />
     <item
         android:id="@+id/nav_event_done"
         android:icon="@drawable/ic_menu_event_done_24"
-        android:title="@string/title_menu_finished"
-        />
+        android:title="@string/title_menu_finished" />
 
 </menu>

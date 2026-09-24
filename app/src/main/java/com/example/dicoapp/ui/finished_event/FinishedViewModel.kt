@@ -1,4 +1,4 @@
-package com.example.dicoapp.ui.upcoming_event
+package com.example.dicoapp.ui.finished_event
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -16,7 +16,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import kotlin.time.Duration.Companion.milliseconds
 
-class UpcomingViewModel : ViewModel() {
+class FinishedViewModel : ViewModel() {
 
     private val _listEvents = MutableLiveData<List<ListEventsItem>>()
     val listEvents: LiveData<List<ListEventsItem>> = _listEvents
@@ -33,12 +33,13 @@ class UpcomingViewModel : ViewModel() {
 
     private var searchJob: Job? = null
 
+
     companion object {
-        private const val TAG = "UpcomingViewModel"
+        private const val TAG = "FinishedViewModel"
     }
 
     init {
-        getUpcomingEvents()
+        getFinishedEvents()
     }
 
     fun onSearchQuery(query: String) {
@@ -50,36 +51,33 @@ class UpcomingViewModel : ViewModel() {
 
         searchJob = viewModelScope.launch {
             delay(500L.milliseconds)
-            getUpcomingEvents(query)
+            getFinishedEvents(query)
         }
-
     }
 
-    fun getUpcomingEvents(query: String? = null) {
+
+    fun getFinishedEvents(query: String? = null) {
         _isLoading.value = true
         Log.d(TAG, "init hit API")
-        val response = ApiConfig.getApiService().getEvents(active = 1, query = query)
+        val response = ApiConfig.getApiService().getEvents(active = 0, query)
         response.enqueue(object : Callback<GetEventResponse> {
             override fun onResponse(
                 call: Call<GetEventResponse?>,
                 response: Response<GetEventResponse?>
             ) {
+                _isLoading.value = false
                 if (query == null) {
                     _isLoading.value = false
                     if (response.isSuccessful) {
-                        Log.d(TAG, "SUCCESS")
                         _listEvents.value = response.body()?.listEvents
                     } else {
-                        Log.d(TAG, "FAILED")
                         _snackBarText.value = response.message()
                     }
                 } else {
                     _isLoading.value = false
                     if (response.isSuccessful) {
-                        Log.d(TAG, "SUCCESS")
                         _searchedEvents.value = response.body()?.listEvents
                     } else {
-                        Log.d(TAG, "FAILED")
                         _snackBarText.value = response.message()
                     }
                 }

@@ -7,32 +7,33 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dicoapp.data.response.ListEventsItem
-import com.example.dicoapp.databinding.EventItemBinding
+import com.example.dicoapp.databinding.EventHorizontalItemBinding
 
 
-class EventAdapter(private val onItemClick: (ListEventsItem) -> Unit) :
-    ListAdapter<ListEventsItem, EventAdapter.EventViewHolder>(DIFF_CALLBACK) {
+class EventHorizontalCardAdapter(private val onItemClick: (ListEventsItem) -> Unit) :
+    ListAdapter<ListEventsItem, EventHorizontalCardAdapter.EventHorizontalViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): EventViewHolder {
-        val binding = EventItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return EventViewHolder(binding)
+    ): EventHorizontalViewHolder {
+        val binding =
+            EventHorizontalItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return EventHorizontalViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: EventHorizontalViewHolder, position: Int) {
         val event = getItem(position)
         holder.bind(event)
     }
 
-    inner class EventViewHolder(val binding: EventItemBinding) :
+    inner class EventHorizontalViewHolder(val binding: EventHorizontalItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(event: ListEventsItem) {
             binding.tvEventName.text = event.name
             binding.tvSummary.text = event.summary
 
             Glide.with(itemView.context)
-                .load(event.imageLogo)
+                .load(event.mediaCover)
                 .into(binding.ivMediaCover)
 
             itemView.setOnClickListener {

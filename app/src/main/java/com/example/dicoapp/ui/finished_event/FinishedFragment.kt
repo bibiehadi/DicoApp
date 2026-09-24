@@ -4,57 +4,126 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicoapp.R
+import com.example.dicoapp.adapter.EventAdapter
+import com.example.dicoapp.adapter.EventHorizontalCardAdapter
+import com.example.dicoapp.databinding.FragmentFinishedBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [androidx.fragment.app.Fragment] subclass.
- * Use the [FinishedFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FinishedFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentFinishedBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val viewModel: FinishedViewModel by viewModels()
+    private lateinit var eventAdapter: EventHorizontalCardAdapter
+    private lateinit var eventSearchAdapter: EventAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_finished, container, false)
+    ): View {
+        _binding = FragmentFinishedBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FinishedFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FinishedFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupSearchView()
+        observeViewModel()
+
+    }
+
+    private fun setupRecyclerView() {
+        eventAdapter = EventHorizontalCardAdapter { event ->
+            val bundle = Bundle().apply {
+                putString(EXTRA_EVENT_ID, event.id.toString())
             }
+            findNavController().navigate(R.id.detailEventActivity, bundle)
+        }
+
+        binding.rvFinishedEvents.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@FinishedFragment.eventAdapter
+        }
+    }
+
+    private fun setupSearchView() {
+        binding.searchView.setupWithSearchBar(binding.searchBarEvent)
+
+        eventSearchAdapter = EventAdapter { event ->
+            val bundle = Bundle().apply {
+                putString(EXTRA_EVENT_ID, event.id.toString())
+            }
+            findNavController().navigate(R.id.detailEventActivity, bundle)
+        }
+        eventSearchAdapter = EventAdapter { event ->
+            val bundle = Bundle().apply {
+                putString(EXTRA_EVENT_ID, event.id.toString())
+            }
+            findNavController().navigate(R.id.detailEventActivity, bundle)
+        }
+
+        binding.rvSearchUpcomingEvents.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@FinishedFragment.eventSearchAdapter
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.listEvents.observe(viewLifecycleOwner) { events ->
+            eventAdapter.submitList(events)
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading)
+                binding.progressBar.visibility = View.VISIBLE
+            else
+                binding.progressBar.visibility = View.INVISIBLE
+        }
+
+        viewModel.snackBarText.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.searchView.editText.setOnEditorActionListener { _, _, _ ->
+            val query = binding.searchView.text.toString()
+            binding.tvSearchMessage.visibility = View.INVISIBLE
+            eventSearchAdapter.submitList(null)
+            viewModel.onSearchQuery(query)
+            false
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading)
+                binding.progressBarSearch.visibility = View.VISIBLE
+            else
+                binding.progressBarSearch.visibility = View.INVISIBLE
+        }
+
+        viewModel.searchedEvents.observe(viewLifecycleOwner) { events ->
+            if (events.isEmpty() && binding.searchView.text.isNotBlank()) {
+                binding.tvSearchMessage.visibility = View.VISIBLE
+                binding.rvSearchUpcomingEvents.visibility = View.INVISIBLE
+                binding.tvSearchMessage.text = getString(R.string.event_not_found)
+            } else if (events.isNotEmpty()) {
+                binding.tvSearchMessage.visibility = View.INVISIBLE
+                binding.rvSearchUpcomingEvents.visibility = View.VISIBLE
+                eventSearchAdapter.submitList(events)
+            }
+        }
+    }
+
+
+    companion object {
+        //        private const val TAG = "FinishedFragment"
+        const val EXTRA_EVENT_ID = "extra_event_id"
     }
 }
