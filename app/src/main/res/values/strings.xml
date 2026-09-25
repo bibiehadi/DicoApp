@@ -22,4 +22,7 @@
     <string name="tv_quota">1000</string>
     <string name="btn_register">Register</string>
     <string name="tv_owner">by Dicoding</string>
+    <string name="tv_event_category">Event category</string>
+    <string name="tv_event_info">Event Info</string>
+    <string name="tv_event_summary">Event Summary</string>
 </resources>

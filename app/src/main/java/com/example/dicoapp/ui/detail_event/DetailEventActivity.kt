@@ -11,7 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import com.bumptech.glide.Glide
+import com.example.dicoapp.R
 import com.example.dicoapp.databinding.ActivityDetailEventBinding
+import com.example.dicoapp.utils.formatEventDateRange
 
 class DetailEventActivity : AppCompatActivity() {
 
@@ -37,7 +39,7 @@ class DetailEventActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed() // Menutup activity dan kembali ke halaman sebelumnya
+        onBackPressedDispatcher.onBackPressed()
         return true
     }
 
@@ -50,12 +52,16 @@ class DetailEventActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(events.mediaCover)
                 .into(binding.ivEventImage)
+            binding.tvEventInfo.text = getString(R.string.tv_event_info)
+            binding.tvEventSummary.text = getString(R.string.tv_event_summary)
             binding.tvEventName.text = events.name
             binding.tvEventOwner.text = "by " + events.ownerName
-            binding.tvEventQuota.text = events.quota.toString()
+            binding.tvEventQuota.text =
+                events.quota.toString() + " (" + (events.quota - events.registrants) + "available)"
             binding.tvEventCategory.text = events.category
             binding.tvEventLocation.text = events.cityName
             binding.tvSummary.text = events.summary
+            binding.tvEventTime.text = formatEventDateRange(events.beginTime, events.endTime)
             binding.tvDescription.text = HtmlCompat.fromHtml(
                 events.description,
                 HtmlCompat.FROM_HTML_MODE_LEGACY
