@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.dicoapp.utils
 
 import java.text.SimpleDateFormat
@@ -29,7 +31,7 @@ fun formatEventDateRange(beginTime: String?, endTime: String?): String {
         } else {
             "$formattedStartDate, $startTime - $formattedEndDate, $endTimeStr WIB"
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         beginTime
     }
 }

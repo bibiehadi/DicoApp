@@ -10,8 +10,8 @@
     <string name="event_desc">Deskripsi singkat event…</string>
     <string name="search_events">Search events</string>
     <string name="this_is_the_poster_event">this is the poster event</string>
-    <string name="search_upcoming_event">Search upcoming event...</string>
-    <string name="search_finished_event">Search finished event...</string>
+    <string name="search_upcoming_event">Search upcoming event…</string>
+    <string name="search_finished_event">Search finished event…</string>
     <string name="tv_finished_event">Finished Event</string>
     <string name="tv_upcoming_event">Upcoming Event</string>
     <string name="upcoming_event_not_found">Belum ada event yang akan diselenggarakan dalam waktu dekat</string>
