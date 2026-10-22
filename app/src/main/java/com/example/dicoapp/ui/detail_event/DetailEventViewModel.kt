@@ -3,14 +3,14 @@ package com.example.dicoapp.ui.detail_event
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dicoapp.data.remote.ApiConfig
-import com.example.dicoapp.data.response.Event
-import com.example.dicoapp.data.response.GetDetailEventResponse
+import com.example.dicoapp.data.remote.response.Event
+import com.example.dicoapp.data.remote.response.GetDetailEventResponse
+import com.example.dicoapp.data.repositories.EventRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailEventViewModel : ViewModel() {
+class DetailEventViewModel(private val repository: EventRepository) : ViewModel() {
     private val _dataEvent = MutableLiveData<Event>()
     val dataEvent: LiveData<Event> = _dataEvent
 
@@ -20,13 +20,9 @@ class DetailEventViewModel : ViewModel() {
     private val _snackBarText = MutableLiveData<String>()
     val snackBarText: LiveData<String> = _snackBarText
 
-    companion object {
-        private const val TAG = "EventDetailViewModel"
-    }
-
     fun getDetailEvent(id: String) {
         _isLoading.value = true
-        val response = ApiConfig.getApiService().getDetailEvent(id)
+        val response = repository.getDetailEvent(id)
         response.enqueue(object : Callback<GetDetailEventResponse> {
             override fun onResponse(
                 call: Call<GetDetailEventResponse?>,

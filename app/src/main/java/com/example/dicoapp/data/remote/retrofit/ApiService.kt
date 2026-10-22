@@ -1,7 +1,7 @@
-package com.example.dicoapp.data.remote
+package com.example.dicoapp.data.remote.retrofit
 
-import com.example.dicoapp.data.response.GetDetailEventResponse
-import com.example.dicoapp.data.response.GetEventResponse
+import com.example.dicoapp.data.remote.response.GetDetailEventResponse
+import com.example.dicoapp.data.remote.response.GetEventResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path

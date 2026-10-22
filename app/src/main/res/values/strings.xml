@@ -23,6 +23,15 @@
     <string name="btn_register">Register</string>
     <string name="tv_owner">by Dicoding</string>
     <string name="tv_event_category">Event category</string>
-    <string name="tv_event_info">Event Info</string>
+    <string name="tv_event_info">About this event</string>
     <string name="tv_event_summary">Event Summary</string>
+    <string name="tv_event_owner">by %1$s</string>
+    <string name="tv_event_quota">%1$s slots left</string>
+    <string name="event_owner">Dicoding</string>
+    <string name="event_date">Event Date</string>
+    <string name="tv_row_value">Online</string>
+    <string name="tv_row_title">Date dan Time</string>
+    <string name="row_title_date_time"><![CDATA[Date & time]]></string>
+    <string name="row_title_location">Location</string>
+    <string name="row_title_remaining_quota">Remaining quota</string>
 </resources>

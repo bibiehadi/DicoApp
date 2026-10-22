@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/img_row"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.DicoApp.RoundedImage"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:strokeWidth="2dp" />
+
+    <TextView
+        android:id="@+id/tv_row_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/tv_row_title"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/img_row"
+        app:layout_constraintTop_toTopOf="@id/img_row" />
+
+    <TextView
+        android:id="@+id/tv_row_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_row_value"
+        android:textSize="16sp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toEndOf="@id/img_row"
+        app:layout_constraintBottom_toBottomOf="@id/img_row" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

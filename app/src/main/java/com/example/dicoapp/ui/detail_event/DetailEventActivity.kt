@@ -1,6 +1,5 @@
 package com.example.dicoapp.ui.detail_event
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -13,13 +12,16 @@ import androidx.core.text.HtmlCompat
 import com.bumptech.glide.Glide
 import com.example.dicoapp.R
 import com.example.dicoapp.databinding.ActivityDetailEventBinding
+import com.example.dicoapp.ui.ViewModelFactory
 import com.example.dicoapp.utils.formatEventDateRange
 
 class DetailEventActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailEventBinding
 
-    private val viewModel: DetailEventViewModel by viewModels()
+    private val viewModel: DetailEventViewModel by viewModels() {
+        ViewModelFactory.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,36 +45,44 @@ class DetailEventActivity : AppCompatActivity() {
         return true
     }
 
-    @SuppressLint("SetTextI18n")
     private fun observeViewModel() {
         viewModel.dataEvent.observe(this) { events ->
-            binding.toolbar.setNavigationOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
-            }
-            Glide.with(this)
-                .load(events.mediaCover)
-                .into(binding.ivEventImage)
-            binding.tvEventInfo.text = getString(R.string.tv_event_info)
-            binding.tvEventSummary.text = getString(R.string.tv_event_summary)
-            binding.tvEventName.text = events.name
-            binding.tvEventOwner.text = "by " + events.ownerName
-            binding.tvEventQuota.text =
-                events.quota.toString() + " (" + (events.quota - events.registrants) + "available)"
-            binding.tvEventCategory.text = events.category
-            binding.tvEventLocation.text = events.cityName
-            binding.tvSummary.text = events.summary
-            binding.tvEventTime.text = formatEventDateRange(events.beginTime, events.endTime)
-            binding.tvDescription.text = HtmlCompat.fromHtml(
-                events.description,
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-            )
+            with(binding) {
+                toolbar.setNavigationOnClickListener {
+                    onBackPressedDispatcher.onBackPressed()
+                }
+                Glide.with(this@DetailEventActivity)
+                    .load(events.mediaCover)
+                    .into(ivEventImage)
+                tvEventInfo.text = getString(R.string.tv_event_info)
+                tvEventName.text = events.name
+                tvEventOwner.text = getString(R.string.tv_event_owner, events.ownerName)
+                tvEventCategory.text = events.category
+                rowDate.tvRowTitle.text = getString(R.string.row_title_date_time)
+                rowDate.tvRowValue.text = formatEventDateRange(events.beginTime, events.endTime)
+                rowLocation.imgRow.setImageResource(R.drawable.ic_location)
+                rowLocation.tvRowTitle.text = getString(R.string.row_title_location)
+                rowLocation.tvRowValue.text = events.cityName
+                rowQuota.imgRow.setImageResource(R.drawable.ic_people)
+                rowQuota.tvRowTitle.text = getString(R.string.row_title_remaining_quota)
+                rowQuota.tvRowValue.text =
+                    getString(
+                        R.string.tv_event_quota,
+                        (events.quota - events.registrants).toString()
+                    )
 
-            binding.btnRegister.setOnClickListener {
-                if (events.link.isNotEmpty()) {
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        data = events.link.toUri()
+                tvDescription.text = HtmlCompat.fromHtml(
+                    events.description,
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+
+                btnRegister.setOnClickListener {
+                    if (events.link.isNotEmpty()) {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = events.link.toUri()
+                        }
+                        startActivity(intent)
                     }
-                    startActivity(intent)
                 }
             }
         }

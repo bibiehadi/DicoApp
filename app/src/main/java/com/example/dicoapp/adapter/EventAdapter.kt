@@ -6,11 +6,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dicoapp.data.response.ListEventsItem
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.dicoapp.R
+import com.example.dicoapp.data.remote.response.ListEventsItem
 import com.example.dicoapp.databinding.EventItemBinding
+import com.example.dicoapp.utils.EventType
+import com.example.dicoapp.utils.formatEventDateRange
 
 
-class EventAdapter(private val onItemClick: (ListEventsItem) -> Unit) :
+class EventAdapter(
+    private val eventType: EventType,
+    private val onItemClick: (ListEventsItem) -> Unit
+) :
     ListAdapter<ListEventsItem, EventAdapter.EventViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -28,13 +36,27 @@ class EventAdapter(private val onItemClick: (ListEventsItem) -> Unit) :
     inner class EventViewHolder(val binding: EventItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(event: ListEventsItem) {
-            binding.tvEventName.text = event.name
-            binding.tvSummary.text = event.summary
+            binding.apply {
+                tvEventName.text = event.name
+                tvEventOwner.text = event.ownerName
+                Glide.with(itemView.context)
+                    .load(event.imageLogo)
+                    .transform(CenterCrop(), RoundedCorners(16))
+                    .into(ivMediaCover)
 
-            Glide.with(itemView.context)
-                .load(event.imageLogo)
-                .into(binding.ivMediaCover)
+                when (eventType) {
+                    EventType.UPCOMING -> {
+                        tvEventDatetime.text = formatEventDateRange(event.beginTime, event.endTime)
+                    }
 
+                    EventType.FINISHED -> {
+                        icEventStatus.setImageResource(R.drawable.ic_done)
+                        tvEventDatetime.text = formatEventDateRange(event.beginTime, event.endTime)
+                    }
+                }
+
+
+            }
             itemView.setOnClickListener {
                 onItemClick(event)
             }

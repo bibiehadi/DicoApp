@@ -1,7 +1,6 @@
 package com.example.dicoapp.ui.upcoming_event
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,16 +11,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicoapp.R
 import com.example.dicoapp.adapter.EventAdapter
-import com.example.dicoapp.adapter.EventHorizontalCardAdapter
 import com.example.dicoapp.databinding.FragmentUpcomingBinding
+import com.example.dicoapp.ui.ViewModelFactory
 import com.example.dicoapp.ui.finished_event.FinishedFragment
+import com.example.dicoapp.utils.EventType
 
 class UpcomingFragment : Fragment() {
     private var _binding: FragmentUpcomingBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: UpcomingViewModel by viewModels()
-    private lateinit var eventAdapter: EventHorizontalCardAdapter
+    private val viewModel: UpcomingViewModel by viewModels() {
+        ViewModelFactory.getInstance(requireContext())
+    }
+    private lateinit var eventAdapter: EventAdapter
     private lateinit var eventSearchAdapter: EventAdapter
 
     override fun onCreateView(
@@ -42,15 +44,14 @@ class UpcomingFragment : Fragment() {
     private fun setupSearchView() {
         binding.searchView.setupWithSearchBar(binding.searchBarEvent)
 
-        eventSearchAdapter = EventAdapter { event ->
-            Log.d(TAG, "navigate to detail page")
+        eventSearchAdapter = EventAdapter(EventType.UPCOMING) { event ->
             val bundle = Bundle().apply {
                 putString(EXTRA_EVENT_ID, event.id.toString())
             }
             findNavController().navigate(R.id.detailEventActivity, bundle)
         }
 
-        eventSearchAdapter = EventAdapter { event ->
+        eventSearchAdapter = EventAdapter(EventType.UPCOMING) { event ->
             val bundle = Bundle().apply {
                 putString(FinishedFragment.EXTRA_EVENT_ID, event.id.toString())
             }
@@ -66,7 +67,11 @@ class UpcomingFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.tvMessage.visibility = View.INVISIBLE
-        eventAdapter = EventHorizontalCardAdapter {
+        eventAdapter = EventAdapter(EventType.UPCOMING) { event ->
+            val bundle = Bundle().apply {
+                putString(FinishedFragment.EXTRA_EVENT_ID, event.id.toString())
+            }
+            findNavController().navigate(R.id.detailEventActivity, bundle)
         }
 
         binding.rvUpcomingEvents.apply {
@@ -78,7 +83,6 @@ class UpcomingFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.listEvents.observe(viewLifecycleOwner) { events ->
-            Log.d(TAG, events.size.toString())
             if (events.isEmpty()) {
                 binding.tvMessage.visibility = View.VISIBLE
                 binding.tvMessage.text =
@@ -117,15 +121,16 @@ class UpcomingFragment : Fragment() {
         }
 
         viewModel.searchedEvents.observe(viewLifecycleOwner) { events ->
-            Log.d(TAG, events.size.toString())
-            if (events.isEmpty() && binding.searchView.text.isNotBlank()) {
-                binding.tvSearchMessage.visibility = View.VISIBLE
-                binding.rvSearchUpcomingEvents.visibility = View.INVISIBLE
-                binding.tvSearchMessage.text = getString(R.string.event_not_found)
-            } else if (events.isNotEmpty()) {
-                binding.tvSearchMessage.visibility = View.INVISIBLE
-                binding.rvSearchUpcomingEvents.visibility = View.VISIBLE
-                eventSearchAdapter.submitList(events)
+            binding.apply {
+                if (events.isEmpty() && searchView.text.isNotBlank()) {
+                    tvSearchMessage.visibility = View.VISIBLE
+                    rvSearchUpcomingEvents.visibility = View.INVISIBLE
+                    tvSearchMessage.text = getString(R.string.event_not_found)
+                } else if (events.isNotEmpty()) {
+                    tvSearchMessage.visibility = View.INVISIBLE
+                    rvSearchUpcomingEvents.visibility = View.VISIBLE
+                    eventSearchAdapter.submitList(events)
+                }
             }
         }
 
@@ -133,7 +138,6 @@ class UpcomingFragment : Fragment() {
 
 
     companion object {
-        private const val TAG = "UpcomingFragment"
         const val EXTRA_EVENT_ID = "extra_event_id"
 
     }

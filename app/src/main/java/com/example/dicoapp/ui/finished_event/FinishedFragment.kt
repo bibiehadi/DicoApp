@@ -11,15 +11,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicoapp.R
 import com.example.dicoapp.adapter.EventAdapter
-import com.example.dicoapp.adapter.EventHorizontalCardAdapter
 import com.example.dicoapp.databinding.FragmentFinishedBinding
+import com.example.dicoapp.ui.ViewModelFactory
+import com.example.dicoapp.utils.EventType
 
 class FinishedFragment : Fragment() {
     private var _binding: FragmentFinishedBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: FinishedViewModel by viewModels()
-    private lateinit var eventAdapter: EventHorizontalCardAdapter
+    private val viewModel: FinishedViewModel by viewModels() {
+        ViewModelFactory.getInstance(requireContext())
+    }
+    private lateinit var eventAdapter: EventAdapter
     private lateinit var eventSearchAdapter: EventAdapter
 
 
@@ -40,7 +43,7 @@ class FinishedFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        eventAdapter = EventHorizontalCardAdapter { event ->
+        eventAdapter = EventAdapter(EventType.FINISHED) { event ->
             val bundle = Bundle().apply {
                 putString(EXTRA_EVENT_ID, event.id.toString())
             }
@@ -56,13 +59,13 @@ class FinishedFragment : Fragment() {
     private fun setupSearchView() {
         binding.searchView.setupWithSearchBar(binding.searchBarEvent)
 
-        eventSearchAdapter = EventAdapter { event ->
+        eventSearchAdapter = EventAdapter(EventType.FINISHED) { event ->
             val bundle = Bundle().apply {
                 putString(EXTRA_EVENT_ID, event.id.toString())
             }
             findNavController().navigate(R.id.detailEventActivity, bundle)
         }
-        eventSearchAdapter = EventAdapter { event ->
+        eventSearchAdapter = EventAdapter(EventType.FINISHED) { event ->
             val bundle = Bundle().apply {
                 putString(EXTRA_EVENT_ID, event.id.toString())
             }
@@ -109,14 +112,16 @@ class FinishedFragment : Fragment() {
         }
 
         viewModel.searchedEvents.observe(viewLifecycleOwner) { events ->
-            if (events.isEmpty() && binding.searchView.text.isNotBlank()) {
-                binding.tvSearchMessage.visibility = View.VISIBLE
-                binding.rvSearchUpcomingEvents.visibility = View.INVISIBLE
-                binding.tvSearchMessage.text = getString(R.string.event_not_found)
-            } else if (events.isNotEmpty()) {
-                binding.tvSearchMessage.visibility = View.INVISIBLE
-                binding.rvSearchUpcomingEvents.visibility = View.VISIBLE
-                eventSearchAdapter.submitList(events)
+            binding.apply {
+                if (events.isEmpty() && searchView.text.isNotBlank()) {
+                    tvSearchMessage.visibility = View.VISIBLE
+                    rvSearchUpcomingEvents.visibility = View.INVISIBLE
+                    tvSearchMessage.text = getString(R.string.event_not_found)
+                } else if (events.isNotEmpty()) {
+                    tvSearchMessage.visibility = View.INVISIBLE
+                    rvSearchUpcomingEvents.visibility = View.VISIBLE
+                    eventSearchAdapter.submitList(events)
+                }
             }
         }
     }

@@ -1,13 +1,12 @@
 package com.example.dicoapp.ui.finished_event
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dicoapp.data.remote.ApiConfig
-import com.example.dicoapp.data.response.GetEventResponse
-import com.example.dicoapp.data.response.ListEventsItem
+import com.example.dicoapp.data.remote.response.GetEventResponse
+import com.example.dicoapp.data.remote.response.ListEventsItem
+import com.example.dicoapp.data.repositories.EventRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import kotlin.time.Duration.Companion.milliseconds
 
-class FinishedViewModel : ViewModel() {
+class FinishedViewModel(private val repository: EventRepository) : ViewModel() {
 
     private val _listEvents = MutableLiveData<List<ListEventsItem>>()
     val listEvents: LiveData<List<ListEventsItem>> = _listEvents
@@ -32,11 +31,6 @@ class FinishedViewModel : ViewModel() {
     val snackBarText: LiveData<String> = _snackBarText
 
     private var searchJob: Job? = null
-
-
-    companion object {
-        private const val TAG = "FinishedViewModel"
-    }
 
     init {
         getFinishedEvents()
@@ -58,8 +52,7 @@ class FinishedViewModel : ViewModel() {
 
     fun getFinishedEvents(query: String? = null) {
         _isLoading.value = true
-        Log.d(TAG, "init hit API")
-        val response = ApiConfig.getApiService().getEvents(active = 0, query)
+        val response = repository.getEvents(active = 0, query)
         response.enqueue(object : Callback<GetEventResponse> {
             override fun onResponse(
                 call: Call<GetEventResponse?>,
@@ -85,8 +78,6 @@ class FinishedViewModel : ViewModel() {
 
             override fun onFailure(call: Call<GetEventResponse?>, t: Throwable) {
                 _isLoading.value = false
-                Log.d(TAG, t.message.toString())
-                Log.d(TAG, "ERROR")
                 _snackBarText.value = t.message.toString()
             }
         })
